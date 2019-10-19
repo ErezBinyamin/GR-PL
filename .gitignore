@@ -1,0 +1,7 @@
+# Ignore all hidden files (except .gitignore)
+.*
+!.gitignore
+
+# Ignore any files within an out directory, but not it's .keep file
+*/out/*
+!*/out/.keep
