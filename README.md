@@ -15,7 +15,7 @@ This repo contains several interesting things:
   
 ## Replicate results
 ```
-git clone GR-PL
+git clone https://github.com/ErezBinyamin/GR-PL.git
 cd ./GR-PL/src/data/bls
 bash get_parse_score.sh
 cd ../../
