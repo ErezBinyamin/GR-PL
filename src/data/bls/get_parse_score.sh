@@ -95,3 +95,12 @@ while IFS= read -r line; do
 		C=1
 	fi
 done < "$INPUT_FILE"
+
+# Add header
+# Shorten field names for easier R scripting
+sed -i 's/Totalemployed/phy_lbr/;
+s/Percent_of_total_employed/tot_emp/;
+s/Women/women/;
+s/White/white/;
+s/Black_orAfricanAmerican/black/;
+s/Asian/asian/; s/Hispanicor_Latino/hispanic/' bls.csv
