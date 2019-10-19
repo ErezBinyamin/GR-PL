@@ -1,5 +1,5 @@
 # GR-PL
-Econometric study of Gender Race &amp; Physical Labor
+![Econometric study of Gender Race &amp; Physical Labor](Gender_Race_&_Physical_Labor.pdf)
 
 ## TLDR;
     • There is an inverse relationship between the percentage representation of women in an industry, and that industries liklihood to be classified as "physical labor"
