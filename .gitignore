@@ -4,3 +4,6 @@
 
 # Ignore all directories named out
 *out
+
+#Filetypes
+*.odt
