@@ -11,7 +11,7 @@ library(pastecs)
 #	asian:		Asian(%)
 #	hispanic:	Hispanic(%)
 #bls <- read.csv("./bls.csv")
-bls <- read.csv("./data/bls.csv")
+bls <- read.csv("./data/bls/bls.csv")
 summary(bls)
 
 # M1
@@ -45,7 +45,7 @@ bls_ols_women_clean <- lm(formula = women ~ log(tot_emp) + phy_lbr + white + bla
 # women * tot_emp is the number of WOMEN in the workforce
 bls_ols_num <- lm(formula = I(women*tot_emp) ~ phy_lbr + I(white*tot_emp) + I(black*tot_emp) + I(asian*tot_emp) + I(hispanic*tot_emp), data = bls)
 bls_ols_num <- lm(formula = phy_lbr ~ I(women*tot_emp) + I(white*tot_emp) + I(black*tot_emp) + I(asian*tot_emp) + I(hispanic*tot_emp), data = bls)
-summary(bls_ols_num)
+#summary(bls_ols_num)
 
 # Percent increase in population as a function of demographics
 # Which demographics are indicators of labor force growth
