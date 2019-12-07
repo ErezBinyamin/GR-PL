@@ -40,6 +40,10 @@ coeftest(bls_ols_phylbr ,hccm(bls_ols_phylbr))
 bls_ols_women <- lm(formula = women ~ log(tot_emp) + phy_lbr + white + black + asian + hispanic, data = bls)
 summary(bls_ols_women)
 
+# F test: asain=1
+ftest_2 <- linearHypothesis(bls_ols_phylbr, c("asian=1"))
+ftest_2
+
 # Testing homoskedasticity
 bptest(bls_ols_women) # Breusch Pagan test of homoskedasticity
 
