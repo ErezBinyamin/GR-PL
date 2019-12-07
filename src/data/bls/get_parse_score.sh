@@ -60,7 +60,9 @@ INPUT_FILE=${OUT_DIR}/input_file.txt
 touch ${INPUT_FILE}
 
 
-sed 's/,\s\+/,/g' ${INPUT_CSV} | sed 's/ /_/g; s/-/0/g; /^\s*$/d' > ${INPUT_FILE}
+#sed 's/,\s\+/,/g' ${INPUT_CSV} | sed 's/ /_/g; s/-/0/; /^\s*$/d' > ${INPUT_FILE}
+
+sed 's/,\s\+/,/g' ${INPUT_CSV} | sed '/,-,/d' | sed 's/ /_/g; /^\s*$/d' > ${INPUT_FILE}
 C=0
 mkdir -p ${OUT_DIR}
 while IFS= read -r line; do
