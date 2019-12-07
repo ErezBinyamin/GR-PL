@@ -2,6 +2,8 @@
 # install.package("pastecs")
 getwd()
 library(pastecs)
+library(lmtest)
+library(car)
 
 #	phy_lbr:	Boolean is profession "Physical Labor"
 #	tot_emp:	Total employed(Thousands)
@@ -21,14 +23,32 @@ summary(bls)
 bls_ols_phylbr <- lm(formula = phy_lbr ~ log(tot_emp) + women + white + black + asian + hispanic, data = bls)
 summary(bls_ols_phylbr)
 
+# F test: INSIGNIFICANT VARIABLES: tot_emp white black asian and hispanic
+ftest_1 <- linearHypothesis(bls_ols_phylbr, c("log(tot_emp)=0", "white=0", "black=0", "asian=0", "hispanic=0"))
+ftest_1
+
+# Testing homoskedasticity
+bptest(bls_ols_phylbr) # Breusch Pagan test of homoskedasticity
+
+# T-Test of coefficients: heteroskedasticity-corrected
+coeftest(bls_ols_phylbr ,hccm(bls_ols_phylbr))
+
+
 # M2
 # the regression error:
 # women(i) = β_0 + β_1 ln(tot_emp(i)) + β_2 phy_lbr + β_3 white(i) + β_4 black(i) + β_5 asian(i) + β_6 hispanic(i) + u(i)
 bls_ols_women <- lm(formula = women ~ log(tot_emp) + phy_lbr + white + black + asian + hispanic, data = bls)
 summary(bls_ols_women)
 
-# Extra fun stuff :)
+# Testing homoskedasticity
+bptest(bls_ols_women) # Breusch Pagan test of homoskedasticity
 
+# T-Test of coefficients: heteroskedasticity-corrected
+coeftest(bls_ols_women ,hccm(bls_ols_women))
+
+#################################################################################################################
+# Extra fun stuff :)
+#################################################################################################################
 # M1: Ignoring insignificant variables
 # Exasterbate M1 findings
 bls_ols_phylbr_clean <- lm(formula = phy_lbr ~ women, data = bls)
