@@ -40,6 +40,8 @@ while read l; do
 	fi
 	let C++
 done < ${STAGE_2}
+sed -i '/Total:/d' ${STAGE_3} # Remove summary data field
+
 #!/bin/bash
 # This script reads a CSV with string industry names in the first column
 # It replaces those industry/profession names with either a 0 or a 1 (boolean)
