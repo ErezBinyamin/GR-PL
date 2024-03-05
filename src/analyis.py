@@ -1,3 +1,12 @@
+"""
+Analysis of a data set from US dept of labor Bureau of Labor Statistics to reveal undelying connection between gender, race, and physical labor
+
+TLDR;
+    - There is an inverse relationship between the percentage representation of women in an industry, and that industries liklihood to be classified as "physical labor"
+    - The percentage of Whites, Blacks, Hispanics, Asians, and the total number of people employed in an industry are irrelevant in predicting if the industry will be classified as “physical labor”.
+    - Women are more likely to work in industries with larger populations.
+
+"""
 import pandas
 from pdb import set_trace as bp
 from numpy import log
@@ -11,23 +20,42 @@ lm      = smf.ols
 BLS_CSV = "./data/bls/bls.csv"
 
 def bptest(olsModelData):
+    """
+    Python re-implementation of R Breusch Pagan test of homoskedasticity 'bptest()'
+    @param olsModelData : linear model resulting from statsmodels.formula.api.ols call
+    @return res         : Wrapper instance around statsmodels.stats.api.het_breuschpagan call
+    """
     # Define toString value for bptest result
     class Bpresult:
+        """
+        Wrapper class around statsmodels.stats.api.het_breuschpagan
+          .fieldnames: String fieldnames of Breusch Pagan test results
+          .bpvalues  : Values corresponding to fieldnames
+          .result    : Dictionary of combined fieldnames and values
+          __str__()  : Overload ToString method for nice printing
+        """
         def __init__(self, olsModelData):
+            """
+            Initialization of Bpresult wrapper
+            @param olsModelData: linear model resulting from statsmodels.formula.api.ols call
+            """
             self.olsModelData = olsModelData
             self.fieldnames   = ['Lagrange multiplier statistic', 'p-value', 'f-value', 'p-value']
             self.bpvalues     = sms.het_breuschpagan(olsModelData.resid, olsModelData.model.exog)
-            #self.result     = lzip(self.fieldnames, self.smsbp)
             self.result = {}
             for i in range(len(self.fieldnames)):
                 key   = self.fieldnames[i]
                 value = self.bpvalues[i]
                 self.result[key] = value
         def __str__(self):
+            """
+            Bpresult wrapper __str__ override
+            Will print model formula, Lagrange multiplier statistic (BP), df_model value, and p-value
+            """
             rep = '\n\t-- studentized Breusch-Pagan test --\n'
-            rep += f"formula = {olsModelData.model.formula}\n"
+            rep += f"formula = {self.olsModelData.model.formula}\n"
             rep += f"BP      = {self.result['Lagrange multiplier statistic']}\n"
-            rep += f"df      = {olsModelData.df_model}\n"
+            rep += f"df      = {self.olsModelData.df_model}\n"
             if (self.result['p-value'] < (2.2 * (10**-16))):
                 rep += f"p-value < 2.2e-16\n"
             else:
