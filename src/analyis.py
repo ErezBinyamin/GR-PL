@@ -65,6 +65,56 @@ def bptest(olsModelData):
     res = Bpresult(olsModelData)
     return res
 
+import statsmodels.formula.api as smf
+import pandas as pd
+
+def lmsummary(lm):
+    """Prints an R-style regression summary with asterisks on the p-value column."""
+    
+    # Extract coefficients, standard errors, t-values, and p-values
+    summary_df = pd.DataFrame({
+        'Estimate': lm.params,
+        'Std. Error': lm.bse,
+        't value': lm.tvalues,
+        'Pr(>|t|)': lm.pvalues
+    })
+
+    # Function to add significance stars based on p-value
+    def significance_stars(p):
+        if p < 0.001:
+            return '***'
+        elif p < 0.01:
+            return '**'
+        elif p < 0.05:
+            return '*'
+        elif p < 0.1:
+            return '.'
+        else:
+            return ''
+
+    # Append significance stars to the Pr(>|t|) column
+    summary_df['Significance'] = summary_df['Pr(>|t|)'].apply(significance_stars)
+    summary_df['Pr(>|t|)'] = summary_df.apply(lambda row: f"{row['Pr(>|t|)']:.4f} {row['Significance']}", axis=1)
+    
+    # Drop the extra significance column (already appended to p-value)
+    summary_df = summary_df.drop(columns=['Significance'])
+    
+    # Print in a formatted way similar to R
+    print("\nCoefficients:")
+    print(summary_df.to_string(float_format="%.4f"))
+
+    # Additional model statistics
+    print("\nResidual standard error: {:.4f} on {} degrees of freedom".format(
+        lm.mse_resid**0.5, lm.df_resid
+    ))
+    print("Multiple R-squared: {:.4f}, Adjusted R-squared: {:.4f}".format(
+        lm.rsquared, lm.rsquared_adj
+    ))
+    print("F-statistic: {:.2f} on {} and {} DF,  p-value: {:.4g}".format(
+        lm.fvalue, lm.df_model, lm.df_resid, lm.f_pvalue
+    ))
+
+
 #	phy_lbr:	Boolean is profession "Physical Labor"
 #	tot_emp:	Total employed(Thousands)
 #	women:		Women(%)
@@ -72,37 +122,41 @@ def bptest(olsModelData):
 #	black:		Black(%)
 #	asian:		Asian(%)
 #	hispanic:	Hispanic(%)
+print("### Data Summary ###")
 bls_df = pandas.read_csv(BLS_CSV)
 print(bls_df.describe())
 
 # M1
-# Use R code get the OLS estimates of the parameters of the following regression model, where u i is
-# the regression error:
 # phy_lbr(i) = β_0 + β_1 ln(tot_emp(i)) + β_2 women(i) + β_3 white(i) + β_4 black(i) + β_5 asian(i) + β_6 hispanic(i) + u(i)
+print("### Linear model M1 ###")
 bls_ols_phylbr = lm(formula = "phy_lbr ~ log(tot_emp) + women + white + black + asian + hispanic", data=bls_df).fit()
-print(bls_ols_phylbr.summary())
+#print(bls_ols_phylbr.summary())
+lmsummary(bls_ols_phylbr)
 
 # F test: INSIGNIFICANT VARIABLES: tot_emp white black asian and hispanic
 #ftest_1 <- linearHypothesis(bls_ols_phylbr, c("log(tot_emp)=0", "white=0", "black=0", "asian=0", "hispanic=0"))
 #TODO
 
 # Testing homoskedasticity
+print("### M1 homoskedasticity test ###")
 print(bptest(bls_ols_phylbr))
 
 # T-Test of coefficients: heteroskedasticity-corrected
 #TODO
 
 # M2
-# the regression error:
 # women(i) = β_0 + β_1 ln(tot_emp(i)) + β_2 phy_lbr + β_3 white(i) + β_4 black(i) + β_5 asian(i) + β_6 hispanic(i) + u(i)
+print("### Linear model M2 ###")
 bls_ols_women = lm(formula = "women ~ log(tot_emp) + phy_lbr + white + black + asian + hispanic", data=bls_df).fit()
-print(bls_ols_women.summary())
+#print(bls_ols_women.summary())
+lmsummary(bls_ols_women)
 
 # F test: asain=1
 #ftest_2 <- linearHypothesis(bls_ols_phylbr, c("asian=1"))
 #TODO
 
 # Testing homoskedasticity
+print("### M2 homoskedasticity test ###")
 print(bptest(bls_ols_women))
 
 # T-Test of coefficients: heteroskedasticity-corrected
